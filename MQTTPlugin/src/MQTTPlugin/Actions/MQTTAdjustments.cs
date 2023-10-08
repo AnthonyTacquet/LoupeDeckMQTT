@@ -49,10 +49,7 @@
 
         protected override Boolean ApplyAdjustment(ActionEditorActionParameters actionParameters, Int32 diff)
         {
-            this._text = "" + diff;
-            this.AdjustmentValueChanged();
-
-            _data.MqttPublishAdjustmentAsync(actionParameters, _text);
+            _data.MqttPublishAdjustmentAsync(actionParameters, "" + diff);
 
             if (_start)
                 return true;
