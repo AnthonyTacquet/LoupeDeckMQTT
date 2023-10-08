@@ -37,6 +37,28 @@
             }
         }
 
+        public async Task MqttPublishAdjustmentAsync(ActionEditorActionParameters actionParameters, string payload)
+        {
+            var mqttFactory = new MqttFactory();
+            using (var mqttClient = mqttFactory.CreateMqttClient())
+            {
+                var mqttClientOptions = new MqttClientOptionsBuilder()
+                    .WithTcpServer(actionParameters.Parameters.GetValue("hostname"), int.Parse(actionParameters.Parameters.GetValue("port")))
+                    .Build();
+
+                await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
+
+                var applicationMessage = new MqttApplicationMessageBuilder()
+                    .WithTopic(actionParameters.Parameters.GetValue("topic_publish"))
+                    .WithPayload(payload)
+                    .Build();
+
+                await mqttClient.PublishAsync(applicationMessage, CancellationToken.None);
+
+                await mqttClient.DisconnectAsync();
+            }
+        }
+
         public async void MqttSubscribeAsync(ActionEditorActionParameters actionParameters, ManualResetEvent mqttClientThreadFinished, Func<MqttApplicationMessageReceivedEventArgs, Task> func)
         {
             var mqttFactory = new MqttFactory();

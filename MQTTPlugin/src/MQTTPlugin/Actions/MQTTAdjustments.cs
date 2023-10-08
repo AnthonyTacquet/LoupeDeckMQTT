@@ -6,12 +6,10 @@
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Loupedeck.MQTTPlugin.More;
 
-    using MQTTnet;
-    using MQTTnet.Client;
-
-    public class MQTTCommand : ActionEditorCommand
+    public class MQTTAdjustments : ActionEditorAdjustment
     {
         private ManualResetEvent mqttClientThreadFinished = new ManualResetEvent(false);
         private MqttData _data = new MqttData();
@@ -21,7 +19,7 @@
         private bool _start = false;
 
         // Initializes the command class.
-        public MQTTCommand()
+        public MQTTAdjustments() : base (true)
         {
 
             this.DisplayName = "Publish To A Topic";
@@ -42,10 +40,6 @@
                 .SetRequired());
 
             this.ActionEditor.AddControl(
-                new ActionEditorTextbox(name: "payload", labelText: "Publish Payload:")
-                .SetRequired());
-
-            this.ActionEditor.AddControl(
                 new ActionEditorTextbox(name: "topic_subscribe", labelText: "Topic Subscribe Base:")
             .SetRequired());
 
@@ -53,10 +47,12 @@
                 new ActionEditorTextbox(name: "base_text", labelText: "Base Text:", description: "Text that will always be displayed."));
         }
 
-        // This method is called when the user executes the command.
-        protected override Boolean RunCommand(ActionEditorActionParameters actionParameters)
+        protected override Boolean ApplyAdjustment(ActionEditorActionParameters actionParameters, Int32 diff)
         {
-            _data.MqttPublishAsync(actionParameters);
+            this._text = "" + diff;
+            this.AdjustmentValueChanged();
+
+            _data.MqttPublishAdjustmentAsync(actionParameters, _text);
 
             if (_start)
                 return true;
@@ -67,7 +63,6 @@
 
             _data.MqttSubscribeAsync(actionParameters, mqttClientThreadFinished, _actions.CreateFunction());
 
-            // PluginLog.Info($"Counter value is {this._counter}"); // Write the current counter value to the log file.
             return true;
         }
 
@@ -82,7 +77,7 @@
 
         // This method is called when Loupedeck needs to show the command on the console or the UI.
         protected override string GetCommandDisplayName(ActionEditorActionParameters actionEditorActionParameters) =>
-            $"{actionEditorActionParameters.Parameters.GetValue("base_text")}{_text}";
+            $"{actionEditorActionParameters.Parameters.GetValue("base_text")}\n{_text}";
 
 
     }

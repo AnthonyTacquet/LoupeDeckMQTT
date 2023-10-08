@@ -39,6 +39,9 @@
             this.ActionEditor.AddControl(
                 new ActionEditorTextbox(name: "topic_subscribe", labelText: "Topic Subscribe Base:")
             .SetRequired()); ;
+
+            this.ActionEditor.AddControl(
+               new ActionEditorTextbox(name: "base_text", labelText: "Base Text:", description: "Text that will always be displayed."));
         }
 
         // This method is called when the user executes the command.
@@ -68,11 +71,7 @@
 
         // This method is called when Loupedeck needs to show the command on the console or the UI.
         protected override string GetCommandDisplayName(ActionEditorActionParameters actionEditorActionParameters) =>
-            $"{_text}";
-        /*
-        protected override BitmapImage GetCommandImage(ActionEditorActionParameters actionParameters, Int32 imageWidth, Int32 imageHeight) 
-        {
-        }*/
+            $"{actionEditorActionParameters.Parameters.GetValue("base_text")}{_text}";
 
 
 

@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\MQTTAdjustments.cs" />
     <Compile Include="Actions\MQTTCommand.cs" />
     <Compile Include="Actions\MQTTSubscribe.cs" />
     <Compile Include="More\MqttData.cs" />
@@ -71,8 +72,6 @@
     <Compile Include="MQTTPlugin.cs" />
     <Compile Include="Helpers\PluginLog.cs" />
     <Compile Include="Helpers\PluginResources.cs" />
-    <Compile Include="Actions\CounterAdjustment.cs" />
-    <Compile Include="Actions\CounterCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="metadata\LoupedeckPackage.yaml" />
