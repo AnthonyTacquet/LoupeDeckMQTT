@@ -10,12 +10,15 @@
     using MQTTnet.Client;
 
     using MQTTnet;
+    using Loupedeck.MQTTPlugin.More;
 
     public class MQTTSubscribe : ActionEditorCommand
     {
         private ManualResetEvent mqttClientThreadFinished = new ManualResetEvent(false);
-        MqttData data = new MqttData();
-
+        private MqttData _data = new MqttData();
+        private SubscribeActions _actions = new SubscribeActions();
+        private string _text = "Not Loaded (Press to load)";
+        private bool _start = false;
 
         // Initializes the command class.
         public MQTTSubscribe()
@@ -24,9 +27,10 @@
             this.Description = "Subscribe To A Topic";
             this.GroupName = "";
 
+            _actions.myEvents += Recieved;
 
             this.ActionEditor.AddControl(
-                new ActionEditorTextbox(name: "hostname", labelText: "Hostname:"/*,"Select Scene name"*/)
+                new ActionEditorTextbox(name: "hostname", labelText: "Hostname:")
                     .SetRequired());
 
             this.ActionEditor.AddControl(
@@ -37,34 +41,38 @@
             .SetRequired()); ;
         }
 
-        protected override Boolean OnLoad()
-        {
-            Thread thread = new Thread(() =>
-            {
-                data.MqttSubscribeAsync(); // Pass the parameter to the method
-            });
-
-            thread.Start();
-            return true;
-            return true;
-        }
-
         // This method is called when the user executes the command.
         protected override Boolean RunCommand(ActionEditorActionParameters actionParameters)
         {
-            this.ActionImageChanged(); // Notify the Loupedeck service that the command display name and/or image has changed.
-            // PluginLog.Info($"Counter value is {this._counter}"); // Write the current counter value to the log file.
+            if (_start)
+                return true;
 
+            _start = true;
+            _text = "Loaded, Waiting...";
+            this.ActionImageChanged(); // Notify the Loupedeck service that the command display name and/or image has changed.
+
+            _data.MqttSubscribeAsync(actionParameters, mqttClientThreadFinished, _actions.CreateFunction());
+
+            // PluginLog.Info($"Counter value is {this._counter}"); // Write the current counter value to the log file.
             return true;
+        }
+
+        private void Recieved(object source, MyEventArgs e)
+        {
+            if (e.Type == SubscriptionType.TEXT)
+                _text = e.Value;
+
+            this.ActionImageChanged();
+
         }
 
         // This method is called when Loupedeck needs to show the command on the console or the UI.
         protected override string GetCommandDisplayName(ActionEditorActionParameters actionEditorActionParameters) =>
-            $" To Do ";
-
+            $"{_text}";
+        /*
         protected override BitmapImage GetCommandImage(ActionEditorActionParameters actionParameters, Int32 imageWidth, Int32 imageHeight) 
         {
-        }
+        }*/
 
 
 

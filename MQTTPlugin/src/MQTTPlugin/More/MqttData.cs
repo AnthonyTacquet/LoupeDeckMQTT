@@ -27,7 +27,7 @@
                 await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
 
                 var applicationMessage = new MqttApplicationMessageBuilder()
-                    .WithTopic(actionParameters.Parameters.GetValue("topic"))
+                    .WithTopic(actionParameters.Parameters.GetValue("topic_publish"))
                     .WithPayload(actionParameters.Parameters.GetValue("payload"))
                     .Build();
 

@@ -63,7 +63,9 @@
     <Compile Include="Actions\MQTTCommand.cs" />
     <Compile Include="Actions\MQTTSubscribe.cs" />
     <Compile Include="More\MqttData.cs" />
+    <Compile Include="More\MyEventArgs.cs" />
     <Compile Include="More\SubscribeActions.cs" />
+    <Compile Include="More\SubscriptionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MQTTApplication.cs" />
     <Compile Include="MQTTPlugin.cs" />
