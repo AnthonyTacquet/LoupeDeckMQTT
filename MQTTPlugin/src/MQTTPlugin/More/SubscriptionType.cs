@@ -8,6 +8,6 @@
 
     public enum SubscriptionType
     {
-        TEXT,
+        TEXT, IMAGE, TEXT_COLOR
     }
 }

@@ -18,13 +18,16 @@
             return e =>
             {
                 string topic = e.ApplicationMessage.Topic;
+                string payload = "";
+                if (e.ApplicationMessage.Payload != null)
+                    payload = System.Text.Encoding.Default.GetString(e.ApplicationMessage.Payload);
 
                 if (topic.EndsWith("/text"))
-                {
-                    string payload = System.Text.Encoding.Default.GetString(e.ApplicationMessage.Payload);
                     myEvents(this, new MyEventArgs(SubscriptionType.TEXT, payload));
-                }
-
+                else if (topic.EndsWith("/image"))
+                    myEvents(this, new MyEventArgs(SubscriptionType.IMAGE, payload));
+                else if (topic.EndsWith("/text_color"))
+                    myEvents(this, new MyEventArgs(SubscriptionType.TEXT_COLOR, payload));
 
                 return Task.CompletedTask;
             };
