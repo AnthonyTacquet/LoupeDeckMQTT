@@ -17,7 +17,12 @@
         private ManualResetEvent mqttClientThreadFinished = new ManualResetEvent(false);
         private MqttData _data = new MqttData();
         private SubscribeActions _actions = new SubscribeActions();
+
         private string _text = "Not Loaded (Press to load)";
+        private BitmapColor _color = BitmapColor.White;
+        private BitmapImage _image = null;
+        private string _baseText = "";
+
         private bool _start = false;
 
         // Initializes the command class.
@@ -64,14 +69,44 @@
         {
             if (e.Type == SubscriptionType.TEXT)
                 _text = e.Value;
+            else if (e.Type == SubscriptionType.IMAGE)
+                _image = BitmapImage.FromBase64String(e.Value);
+            else if (e.Type == SubscriptionType.TEXT_COLOR)
+            {
+                string[] vals = e.Value.Split(',');
+                if (vals.Length != 4)
+                    _text = "Format: Red,Green,Blue,Alpha";
+                else
+                    _color = new BitmapColor(int.Parse(vals[0]), int.Parse(vals[1]), int.Parse(vals[2]), int.Parse(vals[3]));
+            }
 
             this.ActionImageChanged();
 
         }
 
-        // This method is called when Loupedeck needs to show the command on the console or the UI.
-        protected override string GetCommandDisplayName(ActionEditorActionParameters actionEditorActionParameters) =>
-            $"{actionEditorActionParameters.Parameters.GetValue("base_text")}{_text}";
+        protected override BitmapImage GetCommandImage(ActionEditorActionParameters actionParameters, Int32 imageWidth, Int32 imageHeight)
+        {
+            using (var bitmapBuilder = new BitmapBuilder(imageWidth, imageHeight))
+            {
+                if (_image == null || !_start) // Only show text or nothing if no text is given
+                {
+                    bitmapBuilder.DrawText($"{actionParameters.Parameters.GetValue("base_text")}{_text}", color: _color);
+                }
+                else if (_image != null && _baseText == "" && _text == "") // Only show an image
+                {
+                    _image.Crop(0, 0, 64, 64); // The image can only be 64x64
+                    bitmapBuilder.DrawImage(_image, (imageWidth - _image.Width) / 2, (imageHeight - _image.Height) / 2);
+                }
+                else // Return both text and image
+                {
+                    _image.Crop(0, 0, 32, 32); // The image can only be 32x32
+                    bitmapBuilder.DrawImage(_image, (imageWidth - _image.Width) / 2, 10);
+                    bitmapBuilder.DrawText($"{actionParameters.Parameters.GetValue("base_text")}{_text}", (imageWidth - _image.Width) / 2, 52, _image.Width, 10, color: _color);
+                }
+
+                return bitmapBuilder.ToImage();
+            }
+        }
 
 
 
